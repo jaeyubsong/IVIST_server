@@ -1,22 +1,6 @@
 version: '2'
 
 services:
-  react-client:
-    build:
-      context: ./react-frontend/
-      dockerfile: local.Dockerfile
-    volumes:
-      - './react-frontend/:/usr/src/app'
-      - '/usr/src/app/node_modules'
-      - './dataset:/usr/src/app/public/dataset'
-    ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - flask-api
-    image: react_frontend
-    container_name: react_simple_app
   flask-api:
     build:
       context: ./flask-backend/

@@ -18,7 +18,7 @@ ns = api.namespace('vbs', description='design vbs web')
 
 client = MongoClient('127.0.0.1', 27017)
 db = client.testdb
-col = db.allFrames_test
+col = db.allFrames_final
 
 data_dir = '../ir.nist.gov/tv2019/V3C1/V3C1.webm.videos.shots/'
 
@@ -203,23 +203,11 @@ class fileQuery(Resource):
     # current_app.logger.info(doc_list)
     doc_list = []
     for doc in x:
-        doc_list.append(doc)
+      del doc['_id']
+      doc_list.append(doc)
     
-    # y = col.aggregate([
-    #   {
-    #     '$match': { 
-    #       '$or': low_priority
-    #     }
-    #   },
-    #   {"$limit": 1000}
-    # ])
-    # for doc in y:
-    #   if len(doc_list) > 1000:
-    #     break
-    #   doc_list.append(doc)
-    # doc_list = sorted(doc_list, key=functools.cmp_to_key(priority_cmp))
-    # doc_list = doc_list[:1000]
-    current_app.logger.info(doc_list)
+
+    current_app.logger.info(doc_list[0])
     # doc_list = list(set(doc_list))
     current_app.logger.info('Inside high_priority')
     current_app.logger.info(high_priority)
