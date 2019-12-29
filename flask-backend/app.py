@@ -131,7 +131,7 @@ class fileQuery(Resource):
         current_app.logger.info('This is a sentence')
         os.system("bash implement.sh"+item['sentence'])
 
-        with open('/home/ivy/IVIST_server/result_idx.txt', 'r') as scan_result_text:
+        with open('/home/ivy/IVIST_server/flask-backend/result_idx.txt', 'r') as scan_result_text:
           order_array = [line.strip() for line in scan_result_text]
 
         # order_array, scan_dict = get_scan_result(item['sentence'])
