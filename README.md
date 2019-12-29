@@ -1,4 +1,4 @@
-# Simple-React-Flask-App
+# IVIST server
 
 One paragraph description to go
 
@@ -11,17 +11,17 @@ Let's set up the environment
 ### Prerequisites
 
 - Docker
-- Access server with local forwarding to port 3000 
+- Access server via ssh
 - (Optional: Add local forwarding to port 5000 to access flask backend directly)
 ```
-$ ssh USERNAME@"SERVER_IP_ADDRESS" -L localhost:3000:localhost:3000
+$ ssh USERNAME@"SERVER_IP_ADDRESS" -L localhost:5000:localhost:5000
 ```
 
 ### Setting up the environment
 - Build docker image
 ```
-$ git clone https://github.com/jsong0327/Simple-React-Flask-App.git
-$ cd Simple-React-Flask-App
+$ git clone https://github.com/jsong0327/IVIST_server.git
+$ cd IVIST_server
 $ docker-compose build --no-cache
 ```
 
@@ -29,13 +29,6 @@ $ docker-compose build --no-cache
 - start docker image with container
 ```
 $ CURRENT_UID=$(id -u):$(id -g) docker-compose up
-```
-
-- access http://localhost:3000
-
-- start aster container (before start the container, you should remove the existing aster container)
-```
-$ docker run --runtime=nvidia -it --rm -v "volume path" --network "network name" --name "container name" "aster bin/bash"
 ```
 
 
@@ -102,3 +95,4 @@ $ ssh cd /home/USERNAME/SOMEWHERE_IN_YOUR_ACCOUNT
 ```
 $ sudo chown -R $(id -u USERNAME):$(id -g USERNAME) ./mongoData
 ```
+
