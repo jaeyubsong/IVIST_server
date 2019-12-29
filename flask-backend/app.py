@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 from flask_restplus import Api, Resource, fields
-from api import get_scan_result
+# from api import get_scan_result
 
 import json
 import logging
@@ -129,7 +129,12 @@ class fileQuery(Resource):
         cur_cond = {'color': item['color']}
       elif item['type'] == 'sentence':
         current_app.logger.info('This is a sentence')
-        order_array, scan_dict = get_scan_result(item['sentence'])
+        os.system("bash implement.sh"+item['sentence'])
+
+        with open('/home/ivy/IVIST_server/result_idx.txt', 'r') as scan_result_text:
+          order_array = [line.strip() for line in scan_result_text]
+
+        # order_array, scan_dict = get_scan_result(item['sentence'])
         
         # x = col.find({'$or': scan_dict})
         x = col.aggregate([
