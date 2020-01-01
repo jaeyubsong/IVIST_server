@@ -136,7 +136,12 @@ class fileQuery(Resource):
                     }
                 }}
             elif item['type'] == 'text':
-                cur_cond = {'text': item['text']}
+                cur_cond = {'text': {
+                    '$elemMatch': {
+                        '$regex': item['text'],
+                        '$options': 'i'
+                    }
+                }}
             elif item['type'] == 'color':
                 cur_cond = {'color': item['color']}
             elif item['type'] == 'sentence':
@@ -147,7 +152,7 @@ class fileQuery(Resource):
 
                 with open('/simpleFlaskApp/result.txt', 'r') as scan_result_text:
                     order_array = [line.strip() for line in scan_result_text]
-                current_app.logger.info(order_array)
+                # current_app.logger.info(order_array)
 
                 x = col.aggregate([
                     {
@@ -171,6 +176,7 @@ class fileQuery(Resource):
                     },
                     {"$limit": 1000}
                 ])
+
                 doc_list = []
                 for doc in x:
                     doc_list.append(doc)
