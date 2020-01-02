@@ -221,7 +221,7 @@ class fileQuery(Resource):
 
             current_app.logger.info('Ordering results')
             scoring_list = [0] * len(doc_list)
-            sorted_list = [0] * len(doc_list)
+
             for idx in range(len(doc_list)):
                 object_dict_list = doc_list[idx]['object']
                 high_score = [0] * len(high_priority_object)
@@ -241,7 +241,7 @@ class fileQuery(Resource):
                     high_score[q] = max(high_score[q])
 
                 ### Isn't 1.0 too large ?
-                high_score = list(np.array(high_score) + 0.5)
+                high_score = list(np.array(high_score) + 1.0)
                 ### Isn't 1.0 too large ?
 
                 for q, low_obj in enumerate(low_priority_object):
@@ -258,27 +258,12 @@ class fileQuery(Resource):
                     low_score[q] = max(low_score[q])
 
                 scoring_list[idx] = sum(high_score + low_score)
-            # current_app.logger.info(scoring_list)
+            for i, score in enumerate(scoring_list):
+                doc_list[i]['Sorting_Score'] = score
 
-            t = 0
-            for i in range(len(doc_list)):
-                indices = [j for j, x in enumerate(scoring_list) if x == max(scoring_list)]
+            doc_list = sorted(doc_list, key=lambda x: x['Sorting_Score'], reverse=True)
 
-                if sum(scoring_list) == 0:
-                    break
-                if len(indices) == 1:
-                    sorted_list[t] = doc_list[indices[0]]
-                    scoring_list[indices[0]] = 0
-                    t += 1
-                else:
-                    for l in range(len(indices)):
-                        sorted_list[t + l] = doc_list[indices[l]]
-                        for k in indices:
-                            scoring_list[k] = 0
-                    t = t + len(indices)
-
-            doc_list = sorted_list
-
+            current_app.logger.info("Doc list length is %d" %(len(doc_list)))
             current_app.logger.info('Inside high_priority')
             current_app.logger.info(high_priority_object)
             current_app.logger.info('Inside low_priority')
@@ -291,6 +276,44 @@ class fileQuery(Resource):
 
         returnList = jsonify(doc_list)
         return returnList
+
+# @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
+# @ns.route("/getResult")
+# class sendResult(Resource):
+#   def post(self):
+#     current_app.logger.info('Getting Results')
+#     data = request.json
+#     data_list = data['myData']
+#     current_app.logger.info('Data List')
+#     current_app.logger.info(data_list)
+#
+#     category_list = []
+#     sort_type_list = []
+#     for data in data_list:
+#       type = data['type']
+#       if type == 'object':
+#         _type = 'localizedObject'
+#         _category = 'Text'
+#       elif type == 'text':
+#         _type = 'OCR'
+#       elif type == 'sentence'
+#         _type = 'caption'
+#       elif type == 'color':
+#         _type = 'dominantColor'
+#       sort_type_list.append(_type)
+#
+#
+#     result_logging = {"teamID": "IVIST",
+#                       "memberID": "2",
+#                       "timestamp": int(time.time()),
+#                       "usedCategories": ,
+#                       "sortType": ,
+#                       "resultSetAvailability": ,
+#                       "type": ,
+#                       "results": ,
+#                       }
+#
+#     requests.post("http://VBS_LOGGING_SERVER:4444/getString", data={})
 
 
 if __name__ == "__main__":
