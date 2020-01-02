@@ -132,7 +132,8 @@ class fileQuery(Resource):
             if item['type'] == 'object':
                 cur_cond = {'object': {
                     '$elemMatch': {
-                        'label': item['object']
+                        'label': item['object'],
+                        'score': {'$gte': 0.5}
                     }
                 }}
             elif item['type'] == 'text':
