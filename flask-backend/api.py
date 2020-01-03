@@ -5,7 +5,7 @@ from multiprocessing import Process
 import multiprocessing
 import argparse
 
-parser = argparse.ArgumentParse()
+parser = argparse.ArgumentParser()
 parser.add_argument("--sentence", type=list)
 args = parser.parse_args()
 
