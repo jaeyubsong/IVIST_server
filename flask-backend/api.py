@@ -24,7 +24,7 @@ def get_scan_result(ip_addr, sentence, result):
     # return scan_result, resultDict
 
 if __name__ == '__main__':
-    IP_ADDR = ['143.248.49.97', '143.248.49.202', '143.248.49.197', '143.248.49.64']
+    IP_ADDR = ['localhost', '143.248.49.202', '143.248.49.197', '143.248.49.64']
     procs = []
     manager = multiprocessing.Manager()
     result = manaer.dict()
