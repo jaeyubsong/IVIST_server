@@ -149,7 +149,7 @@ class fileQuery(Resource):
                 current_app.logger.info('This is a sentence')
                 # order_array, scan_dict = get_scan_result(item['sentence'])
                 item['sentence'] = '\"' + item['sentence'] + '\"'
-                os.system("bash temp.sh " + item['sentence'])
+                os.system("bash implement.sh " + item['sentence'])
 
                 with open('/simpleFlaskApp/result.txt', 'r') as scan_result_text:
                     order_array = [line.strip() for line in scan_result_text]
@@ -272,6 +272,10 @@ class fileQuery(Resource):
         current_app.logger.info(elapsed)
         current_app.logger.info('Finish ordering')
         current_app.logger.info('Return results to React')
+
+        # r = requests.post("http://demo2.itec.aau.at:80/vbs/submit/", data={'test'})
+        # current_app.logger.info('Check')
+        # current_app.logger.info(r)
 
         returnList = jsonify(doc_list)
         return returnList
