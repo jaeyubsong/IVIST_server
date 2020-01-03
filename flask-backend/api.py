@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     for _ip in IP_ADDR:
         proc = Process(target=get_scan_result, args=(_ip, input_sentence, result))
-        proces.append(proc)
+        procs.append(proc)
         proc.start()
 
     for p in procs:
