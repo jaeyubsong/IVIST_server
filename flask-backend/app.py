@@ -174,8 +174,7 @@ class fileQuery(Resource):
                         '$sort': {
                             '_order': 1
                         }
-                    },
-                    {"$limit": 1000}
+                    }
                 ])
 
                 doc_list = []
@@ -200,8 +199,7 @@ class fileQuery(Resource):
                 '$match': {
                     '$or': query
                 }
-            },
-            {"$limit": 1000}  ### 원래 1000
+            }
         ])
 
         current_app.logger.info('Finished finding')
