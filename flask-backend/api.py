@@ -27,7 +27,7 @@ if __name__ == '__main__':
     IP_ADDR = ['localhost', '143.248.49.202', '143.248.49.197', '143.248.49.64']
     procs = []
     manager = multiprocessing.Manager()
-    result = manaer.dict()
+    result = manager.dict()
 
     input_sentence = "".join(args.sentence)
 
