@@ -130,12 +130,20 @@ class fileQuery(Resource):
         cur_cond = {}
         for item in data_list:
             if item['type'] == 'object':
-                cur_cond = {'object': {
-                    '$elemMatch': {
-                        'label': item['object'],
-                        'score': {'$gte': 0.5}
-                    }
-                }}
+                if item['object'] == 'person':
+                    cur_cond = {'object': {
+                        '$elemMatch': {
+                            'label': item['object'],
+                            'score': {'$gte': 0.7}
+                        }
+                    }}
+                else:
+                    cur_cond = {'object': {
+                        '$elemMatch': {
+                            'label': item['object'],
+                            'score': {'$gte': 0.5}
+                        }
+                    }}
             elif item['type'] == 'text':
                 cur_cond = {'text': {
                     '$elemMatch': {
@@ -151,7 +159,7 @@ class fileQuery(Resource):
                 item['sentence'] = '\"' + item['sentence'] + '\"'
                 os.system("bash implement.sh " + item['sentence'])
 
-                with open('/simpleFlaskApp/result.txt', 'r') as scan_result_text:
+                with open('/simpleFlaskApp/result_idx.txt', 'r') as scan_result_text:
                     order_array = [line.strip() for line in scan_result_text]
                 # current_app.logger.info(order_array)
 
@@ -176,7 +184,7 @@ class fileQuery(Resource):
                         }
                     }
                 ])
-
+                
                 doc_list = []
                 for doc in x:
                     doc_list.append(doc)
@@ -192,24 +200,152 @@ class fileQuery(Resource):
                 low_priority.append(cur_cond)
 
         current_app.logger.info('Before OR and query is:')
-        current_app.logger.info(query)
+        # current_app.logger.info(query)
         # x = col.find({'$or': query})
+
+        # x = col.aggregate([
+        #     {
+        #         '$match': {
+        #             '$or': query
+        #             }
+        #     },
+        #     {
+        #         '$group': {
+        #             '_id': 'null',
+        #             'count': {
+        #                  '$sum': 1
+        #              }
+        #         }
+        #     }
+        # ])
+        # for n in x:
+        #     total_number_docs = n['count']
+        # current_app.logger.info(total_number_docs)
+        # if total_number_docs < 30000:
+        #     for query_dict in query:
+        #         if 'object' in query_dict.keys():
+        #             query_dict['object']['$elemMatch']['score']['$gte'] = 0.9
+        #
+        #
+        # x = col.aggregate([
+        #     {
+        #         '$match': {
+        #             '$or': query
+        #             }
+        #     },
+        #     {
+        #         '$group': {
+        #             '_id': 'null',
+        #             'count': {
+        #                  '$sum': 1
+        #              }
+        #         }
+        #     }
+        # ])
+        # for n in x:
+        #     total_number_docs = n['count']
+        # current_app.logger.info(total_number_docs)
+        # if total_number_docs < 30000:
+        #     for query_dict in query:
+        #         if 'object' in query_dict.keys():
+        #             query_dict['object']['$elemMatch']['score']['$gte'] = 0.8
+        #
+        #
+        # x = col.aggregate([
+        #     {
+        #         '$match': {
+        #             '$or': query
+        #             }
+        #     },
+        #     {
+        #         '$group': {
+        #             '_id': 'null',
+        #             'count': {
+        #                  '$sum': 1
+        #              }
+        #         }
+        #     }
+        # ])
+        # for n in x:
+        #     total_number_docs = n['count']
+        # current_app.logger.info(total_number_docs)
+        # if total_number_docs < 30000:
+        #     for query_dict in query:
+        #         if 'object' in query_dict.keys():
+        #             query_dict['object']['$elemMatch']['score']['$gte'] = 0.7
+        #
+        #
+        # x = col.aggregate([
+        #     {
+        #         '$match': {
+        #             '$or': query
+        #             }
+        #     },
+        #     {
+        #         '$group': {
+        #             '_id': 'null',
+        #             'count': {
+        #                  '$sum': 1
+        #              }
+        #         }
+        #     }
+        # ])
+        # for n in x:
+        #     total_number_docs = n['count']
+        # current_app.logger.info(total_number_docs)
+        # if total_number_docs < 30000:
+        #     for query_dict in query:
+        #         if 'object' in query_dict.keys():
+        #             query_dict['object']['$elemMatch']['score']['$gte'] = 0.6
+        #
+        #
+        # x = col.aggregate([
+        #     {
+        #         '$match': {
+        #             '$or': query
+        #             }
+        #     },
+        #     {
+        #         '$group': {
+        #             '_id': 'null',
+        #             'count': {
+        #                  '$sum': 1
+        #              }
+        #         }
+        #     }
+        # ])
+        # for n in x:
+        #     total_number_docs = n['count']
+        # current_app.logger.info(total_number_docs)
+        #
+        # if total_number_docs < 30000:
+        #     for query_dict in query:
+        #         if 'object' in query_dict.keys():
+        #             query_dict['object']['$elemMatch']['score']['$gte'] = 0.5
+        # current_app.logger.info(query)
         x = col.aggregate([
             {
                 '$match': {
-                    '$or': query
-                }
+                    '$and': query
+                    }
             }
         ])
 
         current_app.logger.info('Finished finding')
 
+
+
         start = time.time()
         # current_app.logger.info(doc_list)
+
         doc_list = []
         for doc in x:
             doc_list.append(doc)
 
+        end = time.time()
+        current_app.logger.info('doc_list.append(doc)')
+        current_app.logger.info(end-start)
+        start = time.time()
         if item['type'] == 'object':
 
             for i in range(len(high_priority)):
@@ -217,10 +353,11 @@ class fileQuery(Resource):
 
             for i in range(len(low_priority)):
                 low_priority_object.append(low_priority[i]['object']['$elemMatch']['label'])
-
-            current_app.logger.info('Ordering results')
+            end = time.time()
             scoring_list = [0] * len(doc_list)
-
+            current_app.logger.info('High/Low priority objects divided')
+            current_app.logger.info(end-start)
+            start = time.time()
             for idx in range(len(doc_list)):
                 object_dict_list = doc_list[idx]['object']
                 high_score = [0] * len(high_priority_object)
@@ -238,7 +375,7 @@ class fileQuery(Resource):
                             pass
 
                     high_score[q] = max(high_score[q])
-
+                    #### if person, minus 1.0??? 0.5???
                 ### Isn't 1.0 too large ?
                 high_score = list(np.array(high_score) + 1.0)
                 ### Isn't 1.0 too large ?
@@ -257,27 +394,35 @@ class fileQuery(Resource):
                     low_score[q] = max(low_score[q])
 
                 scoring_list[idx] = sum(high_score + low_score)
+            end = time.time()
+            current_app.logger.info("Scoring list made")
+            current_app.logger.info(end-start)
+            start = time.time()
             for i, score in enumerate(scoring_list):
                 doc_list[i]['Sorting_Score'] = score
-
+           
             doc_list = sorted(doc_list, key=lambda x: x['Sorting_Score'], reverse=True)
-
+            end = time.time()
+            current_app.logger.info("Sorted!!!")
+            current_app.logger.info(end-start)
             current_app.logger.info("Doc list length is %d" %(len(doc_list)))
             current_app.logger.info('Inside high_priority')
             current_app.logger.info(high_priority_object)
             current_app.logger.info('Inside low_priority')
             current_app.logger.info(low_priority_object)
 
-        elapsed = time.time() - start
-        current_app.logger.info(elapsed)
         current_app.logger.info('Finish ordering')
         current_app.logger.info('Return results to React')
 
         # r = requests.post("http://demo2.itec.aau.at:80/vbs/submit/", data={'test'})
         # current_app.logger.info('Check')
         # current_app.logger.info(r)
-
+        start = time.time()
         returnList = jsonify(doc_list)
+        end = time.time()
+        current_app.logger.info("jsonify")
+        current_app.logger.info(end-start)
+        current_app.logger.info(len(doc_list))
         return returnList
 
 # @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
