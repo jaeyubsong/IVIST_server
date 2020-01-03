@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     final = []
     for _ip in IP_ADDR:
-        final += result(_ip)
+        final += result[_ip]
 
     with open('/home/ivy/IVIST_server/flask-backend/result_idx.txt', 'w') as text:
         for scanID in final:
