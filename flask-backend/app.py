@@ -19,7 +19,7 @@ ns = api.namespace('vbs', description='design vbs web')
 
 client = MongoClient('127.0.0.1', 27017)
 db = client.testdb
-col = db.allFrames_test
+col = db.allFrames_final
 
 data_dir = '../ir.nist.gov/tv2019/V3C1/V3C1.webm.videos.shots/'
 
