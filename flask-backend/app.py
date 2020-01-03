@@ -141,7 +141,7 @@ class fileQuery(Resource):
                     cur_cond = {'object': {
                         '$elemMatch': {
                             'label': item['object'],
-                            'score': {'$gte': 0.5}
+                            'score': {'$gte': 0.4}
                         }
                     }}
             elif item['type'] == 'text':
@@ -375,7 +375,8 @@ class fileQuery(Resource):
                             pass
 
                     high_score[q] = max(high_score[q])
-                    #### if person, minus 1.0??? 0.5???
+                    if high_obj == 'person':
+                        high_socre[q] = high_score[q] - 0.5
                 ### Isn't 1.0 too large ?
                 high_score = list(np.array(high_score) + 1.0)
                 ### Isn't 1.0 too large ?
