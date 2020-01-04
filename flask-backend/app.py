@@ -11,6 +11,8 @@ import json
 import logging
 import numpy as np
 import time
+import requests
+
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -29,6 +31,11 @@ def priority_cmp(a, b):
         return -1
     else:
         return 1
+
+
+def send_test(url_addr, contents):
+    response = requests.post("%s" %(url_addr), data={'CONTENT':contents})
+    return response
 
 
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
@@ -462,15 +469,19 @@ class fileQuery(Resource):
 
         current_app.logger.info('Return results to React')
 
-        # r = requests.post("http://demo2.itec.aau.at:80/vbs/submit/", data={'test'})
-        # current_app.logger.info('Check')
-        # current_app.logger.info(r)
         start = time.time()
         returnList = jsonify(doc_list)
         end = time.time()
         current_app.logger.info("jsonify")
         current_app.logger.info(end-start)
         current_app.logger.info(len(doc_list))
+
+        current_app.logger.info('TEST')
+        res = send_test('http://demo2.itec.aau.at:80/vbs/submit', 'VBS_TEST')
+        current_app.logger.info('CHECK')
+        current_app.logger.info(res.text)
+        current_app.logger.info(res.status_code)
+
         return returnList
 
 # @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
