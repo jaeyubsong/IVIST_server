@@ -123,11 +123,13 @@ class fileQuery(Resource):
         # For now, everything is in $OR
         current_app.logger.info('Finding')
         query = []
+        st_query = []
         high_priority = []
         high_priority_object = []
         low_priority = []
         low_priority_object = []
         cur_cond = {}
+        st_cur_cond = {}
         for item in data_list:
             if item['type'] == 'object':
                 if item['object'] == 'person':
@@ -144,15 +146,18 @@ class fileQuery(Resource):
                             'score': {'$gte': 0.4}
                         }
                     }}
+                query.append(cur_cond)
             elif item['type'] == 'text':
-                cur_cond = {'text': {
+                st_cur_cond = {'text': {
                     '$elemMatch': {
                         '$regex': item['text'],
                         '$options': 'i'
                     }
                 }}
+                st_query.append(st_cur_cond)
             elif item['type'] == 'color':
                 cur_cond = {'color': item['color']}
+                query.append(cur_cond)
             elif item['type'] == 'sentence':
                 current_app.logger.info('This is a sentence')
                 # order_array, scan_dict = get_scan_result(item['sentence'])
@@ -174,6 +179,7 @@ class fileQuery(Resource):
                 current_app.logger.info(len(result_list))
 
                 doc_list = []
+                kkk = 1
                 for i in range(10):
                     order_array = []
                     for it in result_list[i*(len(result_list)//10):(i+1)*(len(result_list)//10)]:
@@ -206,13 +212,15 @@ class fileQuery(Resource):
 
                     for doc in x:
                         doc_list.append(doc)
+                        current_app.logger.info(kkk)
+                        kkk += 1
 
                 current_app.logger.info('=======================================')
                 current_app.logger.info(len(doc_list))
                 returnList = jsonify(doc_list)
                 return returnList
 
-            query.append(cur_cond)
+
             if item['checked'] == True:
                 high_priority.append(cur_cond)
 
@@ -351,10 +359,6 @@ class fileQuery(Resource):
             }
         ])
 
-        current_app.logger.info('Finished finding')
-
-
-
         start = time.time()
         # current_app.logger.info(doc_list)
 
@@ -423,6 +427,7 @@ class fileQuery(Resource):
                 doc_list[i]['Sorting_Score'] = score
            
             doc_list = sorted(doc_list, key=lambda x: x['Sorting_Score'], reverse=True)
+
             end = time.time()
             current_app.logger.info("Sorted!!!")
             current_app.logger.info(end-start)
@@ -431,8 +436,30 @@ class fileQuery(Resource):
             current_app.logger.info(high_priority_object)
             current_app.logger.info('Inside low_priority')
             current_app.logger.info(low_priority_object)
+            current_app.logger.info('Finish ordering')
 
-        current_app.logger.info('Finish ordering')
+
+        current_app.logger.info("?????")
+        current_app.logger.info(st_query)
+        current_app.logger.info(len(st_query))
+        if len(st_query) > 0:
+            st_x = col.aggregate([
+                {
+                    '$match': {
+                        '$and': st_query
+                    }
+                }
+            ])
+
+            st_doc_list = []
+            for doc in st_x:
+                st_doc_list.append(doc)
+
+            current_app.logger.info(len(st_doc_list))
+
+            doc_list = st_doc_list + doc_list
+
+
         current_app.logger.info('Return results to React')
 
         # r = requests.post("http://demo2.itec.aau.at:80/vbs/submit/", data={'test'})
