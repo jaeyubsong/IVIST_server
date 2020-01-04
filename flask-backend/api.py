@@ -4,6 +4,7 @@ import requests
 from multiprocessing import Process
 import multiprocessing
 import argparse
+import csv
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--sentence", type=list)
@@ -43,8 +44,10 @@ if __name__ == '__main__':
     for _ip in IP_ADDR:
         final += result[_ip]
 
-    with open('/simpleFlaskApp/result_idx.txt', 'w') as text:
+    with open('/simpleFlaskApp/result_idx.tsv', 'w') as tsv:
+        tsv_writer = csv.writer(tsv, delimiter='\t')
         for scanID in final:
-            text.write(str(scanID)+'\n')
+            tsv_writer.writerow(scanID)
+
 
 

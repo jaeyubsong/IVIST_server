@@ -159,36 +159,56 @@ class fileQuery(Resource):
                 item['sentence'] = '\"' + item['sentence'] + '\"'
                 os.system("bash implement.sh " + item['sentence'])
 
-                with open('/simpleFlaskApp/result_idx.txt', 'r') as scan_result_text:
-                    order_array = [line.strip() for line in scan_result_text]
-                # current_app.logger.info(order_array)
+                with open('/simpleFlaskApp/result_idx.tsv', 'r') as scan_result_text:
+                    id_sim_list = [line.strip() for line in scan_result_text]
 
-                x = col.aggregate([
-                    {
-                        '$match': {
-                            'scanId': {
-                                '$in': order_array
-                            }
-                        }
-                    },
-                    {
-                        '$addFields': {
-                            '_order': {
-                                '$indexOfArray': [order_array, "$scanId"]
-                            }
-                        }
-                    },
-                    {
-                        '$sort': {
-                            '_order': 1
-                        }
-                    }
-                ])
-                
+                current_app.logger.info('=======================================')
+                current_app.logger.info(len(id_sim_list))
+
+                result_list = []
+                for i in range(len(id_sim_list)):
+                    result_list.append({"scanIndex": int(id_sim_list[i].split('\t')[0]), "similarity": id_sim_list[i].split('\t')[1]})
+                result_list = sorted(result_list, key=lambda x: x['similarity'], reverse=True)
+
+                current_app.logger.info('=======================================')
+                current_app.logger.info(len(result_list))
+
                 doc_list = []
-                for doc in x:
-                    doc_list.append(doc)
+                for i in range(10):
+                    order_array = []
+                    for it in result_list[i*(len(result_list)//10):(i+1)*(len(result_list)//10)]:
+                        order_array.append(it['scanIndex'])
+                    current_app.logger.info('=======================================')
+                    current_app.logger.info(len(order_array))
+                    current_app.logger.info('=======================================')
+                    x = col.aggregate([
+                        {
+                            '$match': {
+                                'scanId': {
+                                    '$in': order_array
+                                }
+                            }
+                        },
+                        {
+                            '$addFields': {
+                                '_order': {
+                                    '$indexOfArray': [order_array, "$scanId"]
+                                }
+                            }
+                        },
+                        {
+                            '$sort': {
+                                '_order': 1
+                            }
+                        }
+                    ])
 
+
+                    for doc in x:
+                        doc_list.append(doc)
+
+                current_app.logger.info('=======================================')
+                current_app.logger.info(len(doc_list))
                 returnList = jsonify(doc_list)
                 return returnList
 
