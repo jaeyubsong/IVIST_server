@@ -12,6 +12,8 @@ import logging
 import numpy as np
 import time
 import requests
+import csv
+
 
 
 app = Flask(__name__)
@@ -185,19 +187,38 @@ class fileQuery(Resource):
                 current_app.logger.info('=======================================')
                 current_app.logger.info(len(result_list))
 
+                """ By loading tsv """
+                scan_dict = []
+                with open('/simpleFlaskApp/real_final.tsv', 'r') as tsv:
+                    t = csv.reader(tsv)
+                    for line in t:
+                        if line[0].split('\t')[0] == 'image_id':
+                            pass
+                        else:
+                            scan_dict.append(line[0].split('\t')[2])
+                current_app.logger.info(len(scan_dict))
+
                 doc_list = []
-                kkk = 1
                 for i in range(10):
-                    order_array = []
+                    scanID_list = []
                     for it in result_list[i*(len(result_list)//10):(i+1)*(len(result_list)//10)]:
-                        order_array.append(it['scanIndex'])
+                        scanID_list.append(it['scanIndex'])
+                    current_app.logger.info('==============scanID_list==============')
+                    current_app.logger.info(len(scanID_list))
                     current_app.logger.info('=======================================')
+
+                    order_array = []
+                    for _id in scanID_list:
+                        order_array.append(scan_dict[_id])
+
+                    current_app.logger.info('==============order_array==============')
                     current_app.logger.info(len(order_array))
                     current_app.logger.info('=======================================')
+
                     x = col.aggregate([
                         {
                             '$match': {
-                                'scanId': {
+                                '_id': {
                                     '$in': order_array
                                 }
                             }
@@ -205,7 +226,7 @@ class fileQuery(Resource):
                         {
                             '$addFields': {
                                 '_order': {
-                                    '$indexOfArray': [order_array, "$scanId"]
+                                    '$indexOfArray': [order_array, "$_id"]
                                 }
                             }
                         },
@@ -216,11 +237,41 @@ class fileQuery(Resource):
                         }
                     ])
 
+                # """ By querying DB directly """
+                # doc_list = []
+                # kkk = 1
+                # for i in range(10):
+                #     order_array = []
+                #     for it in result_list[i*(len(result_list)//10):(i+1)*(len(result_list)//10)]:
+                #         order_array.append(it['scanIndex'])
+                #     current_app.logger.info('=======================================')
+                #     current_app.logger.info(len(order_array))
+                #     current_app.logger.info('=======================================')
+                #     x = col.aggregate([
+                #         {
+                #             '$match': {
+                #                 'scanId': {
+                #                     '$in': order_array
+                #                 }
+                #             }
+                #         },
+                #         {
+                #             '$addFields': {
+                #                 '_order': {
+                #                     '$indexOfArray': [order_array, "$scanId"]
+                #                 }
+                #             }
+                #         },
+                #         {
+                #             '$sort': {
+                #                 '_order': 1
+                #             }
+                #         }
+                #     ])
+
 
                     for doc in x:
                         doc_list.append(doc)
-                        current_app.logger.info(kkk)
-                        kkk += 1
 
                 current_app.logger.info('=======================================')
                 current_app.logger.info(len(doc_list))
@@ -357,7 +408,9 @@ class fileQuery(Resource):
         #     for query_dict in query:
         #         if 'object' in query_dict.keys():
         #             query_dict['object']['$elemMatch']['score']['$gte'] = 0.5
-        # current_app.logger.info(query)
+        current_app.logger.info('ttttttttttt')
+        current_app.logger.info(query)
+
         x = col.aggregate([
             {
                 '$match': {
@@ -476,11 +529,11 @@ class fileQuery(Resource):
         current_app.logger.info(end-start)
         current_app.logger.info(len(doc_list))
 
-        current_app.logger.info('TEST')
-        res = send_test('http://demo2.itec.aau.at:80/vbs/submit', 'VBS_TEST')
-        current_app.logger.info('CHECK')
-        current_app.logger.info(res.text)
-        current_app.logger.info(res.status_code)
+        # current_app.logger.info('TEST')
+        # res = send_test('http://demo2.itec.aau.at:80/vbs/submit', 'VBS_TEST')
+        # current_app.logger.info('CHECK')
+        # current_app.logger.info(res.text)
+        # current_app.logger.info(res.status_code)
 
         return returnList
 
