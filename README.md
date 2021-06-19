@@ -1,6 +1,6 @@
 # IVIST server
 
-One paragraph description to go
+[IVIST: Interactive VIdeo Search Tool in VBS 2020](https://link.springer.com/chapter/10.1007/978-3-030-37734-2_74)
 
 
 
